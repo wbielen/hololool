@@ -9,7 +9,7 @@ import org.springframework.social.twitter.api.Twitter;
 import org.springframework.social.twitter.api.impl.TwitterTemplate;
 
 @Configuration
-@PropertySource({ "file:///opt/projects/hololool/twitterwall/twitter.properties" })
+@PropertySource({ "file:///Users/wilmbielen/Documents/wilm/projecten/var/twitterwall/twitter.properties" })
 public class TwitterConfig {
 
     @Autowired
