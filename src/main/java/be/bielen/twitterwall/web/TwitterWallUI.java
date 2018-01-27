@@ -11,6 +11,7 @@ import com.vaadin.ui.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @SpringUI
@@ -33,18 +34,13 @@ public class TwitterWallUI extends UI {
     private Button btnSearch;
     private TextField txtSearchInput;
 
-    @Override
-    protected void init(VaadinRequest request) {
-
-        Panel mainWindow = new Panel();
-        mainWindow.setSizeFull();
-
+    @PostConstruct
+    public void initLayout() {
         mainLayout = new HorizontalLayout();
-        mainLayout.setWidth(1200, Unit.PIXELS);
-        mainLayout.setSpacing(true);
+        mainLayout.setWidth(100, Unit.PERCENTAGE);
 
         centerLayout = new VerticalLayout();
-        centerLayout.setWidth(600, Unit.PERCENTAGE);
+        centerLayout.setWidth(600, Unit.PIXELS);
         centerLayout.setSpacing(true);
 
         leftLayout = new VerticalLayout();
@@ -95,14 +91,21 @@ public class TwitterWallUI extends UI {
         mainLayout.addComponent(leftLayout);
         mainLayout.addComponent(centerLayout);
         mainLayout.addComponent(rightLayout);
+        mainLayout.setComponentAlignment(leftLayout, Alignment.TOP_CENTER);
+        mainLayout.setComponentAlignment(centerLayout, Alignment.TOP_CENTER);
+        mainLayout.setComponentAlignment(rightLayout, Alignment.TOP_CENTER);
+    }
 
-        mainWindow.setContent(mainLayout);
-
-        setContent(mainWindow);
+    @Override
+    protected void init(VaadinRequest request) {
+        setContent(mainLayout);
     }
 
     private void onButtonSearchForTweetsClick(Button.ClickEvent clickEvent) {
         String searchValue = txtSearchInput.getValue();
+
+        // Clear grid
+        gridLayout.removeAllComponents();
 
         try {
             List<TweetDTO> tweetDTOList = twitterWallDelegate.findTweets(searchValue);
