@@ -8,6 +8,8 @@ import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -17,6 +19,8 @@ import java.util.List;
 @SpringUI
 @Theme("valo")
 public class TwitterWallUI extends UI {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TwitterWallUI.class);
 
     @Value("${twitter.search}")
     private String searchString;
@@ -41,6 +45,7 @@ public class TwitterWallUI extends UI {
 
         centerLayout = new VerticalLayout();
         centerLayout.setWidth(600, Unit.PIXELS);
+        centerLayout.setHeight(100, Unit.PERCENTAGE);
         centerLayout.setSpacing(true);
 
         leftLayout = new VerticalLayout();
@@ -68,14 +73,21 @@ public class TwitterWallUI extends UI {
         searchLayout.setComponentAlignment(txtSearchInput, Alignment.BOTTOM_LEFT);
         searchLayout.setComponentAlignment(btnSearch, Alignment.BOTTOM_LEFT);
 
+        Panel panel = new Panel();
+        panel.setSizeFull();
+        VerticalLayout messagesLayout = new VerticalLayout();
+        messagesLayout.setWidth(100, Unit.PERCENTAGE);
         gridLayout = new GridLayout(1, 20);
-        //gridLayout.setWidth(800, Unit.PIXELS);
+        gridLayout.setWidth(100, Unit.PERCENTAGE);
+
+        messagesLayout.addComponent(gridLayout);
+        panel.setContent(messagesLayout);
 
         centerLayout.addComponent(searchLayout);
-        centerLayout.addComponent(gridLayout);
+        centerLayout.addComponent(panel);
         centerLayout.setComponentAlignment(searchLayout, Alignment.MIDDLE_CENTER);
-        centerLayout.setComponentAlignment(gridLayout, Alignment.MIDDLE_CENTER);
-        centerLayout.setExpandRatio(gridLayout, 1.0f);
+        centerLayout.setComponentAlignment(panel, Alignment.MIDDLE_CENTER);
+        centerLayout.setExpandRatio(panel, 1.0f);
 
         // Build left layout
         Button left = new Button("Left");
@@ -99,9 +111,14 @@ public class TwitterWallUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
         setContent(mainLayout);
+        searchForTweetsAndReloadVissibleTweets();
     }
 
     private void onButtonSearchForTweetsClick(Button.ClickEvent clickEvent) {
+        searchForTweetsAndReloadVissibleTweets();
+    }
+
+    private void searchForTweetsAndReloadVissibleTweets() {
         String searchValue = txtSearchInput.getValue();
 
         // Clear grid
@@ -116,9 +133,8 @@ public class TwitterWallUI extends UI {
             }
 
         } catch (TwitterWallBaseException be) {
-            // Swallow
+            LOGGER.error("Searching for tweets went wrong.", be);
         }
-
     }
 
     private VerticalLayout createTweetLayout(TweetDTO tweetDTO) {
@@ -143,7 +159,7 @@ public class TwitterWallUI extends UI {
             profileLayout.setExpandRatio(nameLabel, 1.0f);
 
             Label textLabel = new Label(tweetDTO.getText());
-            textLabel.setWidth(500, Unit.PIXELS);
+            textLabel.setWidth(100, Unit.PERCENTAGE);
 
             tweetLayout.addComponent(profileLayout);
             tweetLayout.addComponent(textLabel);
